@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Generator</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .receipt {
+            max-width: 100%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 40px;
+        }
+        .signature {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .print-btn {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .print-btn:hover {
+            background-color: #0056b3;
+        }
+        input,textarea{
+            border-radius: 0 !important;
+            border: none !important;
+            outline-style: 0 !important;
+            resize: none !important;
+        }
+        .logo-img {
+            filter: grayscale(100%) brightness(0) invert(0);
+        }
+         
+        @media print {
+            /* Remove margins and padding for a clean print */
+            body, html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+
+            .receipt {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                font-size: 14px; /* Adjust as needed for readability */
+            }
+
+            .row {
+                margin: 0;
+                padding: 0;
+            }
+
+            .logo-img {
+                max-width: 1200px; /* Adjust if needed */
+                width: 100%;
+                height: auto;
+            }
+
+            .col-sm-12 {
+                text-align: center; /* Center align the text for print */
+                margin: 0;
+                padding: 0;
+            }
+
+            h1 {
+                font-size:5rem; /* Adjust to fit the print size */
+                margin: 0.5rem 0;
+            }
+            small{
+                font-size: 2.5rem;
+                margin: 0.5rem 0;
+            }
+
+            .footer{
+                font-size: 2.5rem;
+            }
+
+            .footer small, .footer p, .header small, .total, #notes {
+                font-size: 2.5rem;
+                margin: 0.5rem 0;
+            }
+            .form-control, .table, .btn {
+                font-size: 2.5rem; /* Ensure readability */
+            }
+
+            /* Adjust the table for better fit */
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .table th, .table td {
+                font-size: 2.5rem; /* Adjust as needed */
+                padding: 0.5rem;
+            }
+
+            .table th {
+                background-color: #f8f9fa;
+            }
+
+            .total {
+                font-weight: bold;
+                text-align: right;
+                margin-top: 1rem;
+            }
+
+            .signature {
+                margin-top: 2.5rem;
+                font-size: 2.5rem; /* Adjust size as needed */
+            }
+
+            .signature-line {
+                border-top: 1px solid black;
+                width: 200px; /* Adjust width if needed */
+                margin-top: 4rem;
+            }
+
+            .container-fluid {
+                margin-top: 2.5rem;
+            }
+
+            .btn-primary, .btn-success {
+                display: none; /* Hide print button in the print view */
+            }
+
+            .table th:last-child, .table td:last-child {
+                display: none;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="receipt" x-data="receiptGenerator()">
+        <!-- Logo -->
+        <div class="row align-items-center mb-4">
+            <!-- Logo Section -->
+            <div class="col-sm-12 col-lg-4 text-center text-lg-left">
+                <img src="logo.png" class="logo-img" alt="Logo" style="width: 500px;">
+            </div>
+        
+            <!-- Shop Info Section -->
+            <div class="col-sm-12 col-lg-8 text-center text-lg-right header">
+                <h1 class="mb-1">Affordable Gadgets</h1>
+                <!-- Addresses -->
+                <small class="mb-0">Shop 1: Totoro, Adjacent Owu Baptist Church, Abeokuta, Ogun State.</small> <br>
+                <small class="mb-0">Shop 2: Alawiye Shopping Complex, opposite Polaris Bank, oke-ilewo, Abeokuta, Ogun State.</small> <br>
+                <small class="mb-0">Shop 3: Opp. Slot, beside Eyes Foundation, city computer village, oke-ilewo, Abeokuta, Ogun State.</small>
+            </div>
+        </div>
+    
+        <!-- User Details -->
+        <div class="form-group row">
+            <div class="col-6">
+                <div class="col-sm-12">
+                    <input type="text" id="name" autofocus class="form-control" x-model="user.name" placeholder="Name">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="col-sm-12">
+                    <input type="text" id="phone" class="form-control" x-model="user.phone" placeholder="Phone">
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-6">
+                <div class="col-sm-12">
+                    <input type="text" id="invoice" class="form-control" x-model="user.invoice" placeholder="Invoice No.">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="col-sm-12">
+                    <input type="date" id="date" class="form-control" x-model="user.date" placeholder="Invoice Date">
+                </div>
+            </div>
+        </div>
+    
+        <!-- Items Table -->
+        <div class="table-responsive">
+            <table class="table mt-3">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th>Qty</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="(item, index) in items" :key="index">
+                        <tr>
+                            <td><input type="text" class="form-control" x-model="item.description" placeholder="Description"></td>
+                            <td><input type="number" class="form-control" x-model="item.rate" @input="calculateTotal"></td>
+                            <td><input type="number" class="form-control" x-model="item.quantity" @input="calculateTotal"></td>
+                            <td x-text="`₦ ${ (item.rate * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }`"></td>
+                            <td><button class="btn btn-danger btn-sm" @click="removeItem(index)"><i class="fas fa-trash-alt"></i></button></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    
+        <!-- Add Item Button -->
+        <button class="btn btn-success btn-sm mb-3" @click="addItem"><i class="fas fa-plus"></i> Add Item</button>
+    
+        <!-- Total -->
+        <div class="total text-right font-weight-bold">
+            Total: ₦<span x-text="total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"></span>
+        </div>
+    
+        <!-- Notes -->
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" class="form-control" rows="4" x-model="user.notes"></textarea>
+        </div>
+    
+        <div class="container-fluid">
+            <div class="my-5 text-center footer">
+                <p class="font-weight-bold">TERMS AND CONDITION</p>
+                <small>1. Goods sold in good condition are not refundable and returnable</small> <br>
+                <small>2. Warranty excludes physical/liquid/power damaged</small> <br>
+                <small>3. New undmaged item(s) should be returned within 21 days of purchase for replacement or fixing</small> <br>
+                <small>4. Used undamaged item(s) should be returned within 7 days of purchase</small>
+                <p class="font-weight-bold">Thanks for your patronage</p>
+
+            </div>
+        </div>
+        <!-- Signatures -->
+        <div class="signature d-flex justify-content-between">
+            <div>
+                Seller's Signature
+                <div class="signature-line"></div>
+            </div>
+            <div>
+                Customer's Signature
+                <div class="signature-line"></div>
+            </div>
+        </div>
+    
+        
+    
+        <!-- Print Button -->
+        <button class="btn btn-primary mt-3" @click="printReceipt">Print Receipt</button>
+    </div>
+    
+    <!-- Alpine.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <script>
+        function receiptGenerator() {
+            return {
+                user: {
+                    name: '',
+                    invoice: '',
+                    phone: '',
+                    date: '',
+                    notes: ''
+                },
+                items: [],
+                total: 0,
+                addItem() {
+                    this.items.push({ description: '', rate: 0, quantity: 1 });
+                    this.calculateTotal();
+                },
+                removeItem(index) {
+                    this.items.splice(index, 1);
+                    this.calculateTotal();
+                },
+                calculateTotal() {
+                    // Keep total as a numeric value for calculations
+                    this.total = this.items.reduce((sum, item) => sum + (item.rate * item.quantity), 0);
+                },
+                printReceipt() {
+                    window.print();
+                }
+            }
+        }
+    </script>
+    
+
+</body>
+</html>
